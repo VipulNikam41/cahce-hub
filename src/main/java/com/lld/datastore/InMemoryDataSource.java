@@ -1,21 +1,21 @@
 package com.lld.datastore;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Thread-safe in-memory data source implementation using ConcurrentHashMap.
+ * This implementation handles concurrent access safely without explicit synchronization.
+ */
 public class InMemoryDataSource<K, V> implements DataSource<K, V> {
-    private final Map<K, V> cache;
+    private final ConcurrentHashMap<K, V> cache;
 
     public InMemoryDataSource() {
-        this.cache = new HashMap<>();
+        this.cache = new ConcurrentHashMap<>();
     }
 
     @Override
     public V get(K key) {
-        if (!this.cache.containsKey(key)) {
-            return null;
-        }
         return this.cache.get(key);
     }
 
@@ -31,7 +31,7 @@ public class InMemoryDataSource<K, V> implements DataSource<K, V> {
 
     @Override
     public void delete(List<K> keys) {
-        keys.forEach(this::delete);
+        keys.forEach(this.cache::remove);
     }
 
     @Override
